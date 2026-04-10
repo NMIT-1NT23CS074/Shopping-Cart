@@ -48,11 +48,23 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 script{
-                    withDockerRegistry(credentialsId: '2fe19d8a-3d12-4b82-ba20-9d22e6bf1672', toolName: 'docker') {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
                         
                         sh "docker build -t shopping-cart -f docker/Dockerfile ."
                         sh "docker tag  shopping-cart devaraj74/shopping-cart:latest"
                         sh "docker push devaraj74/shopping-cart:latest"
+                    }
+                }
+            }
+        }
+
+
+        stage('Deploy') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        
+                        sh "docker run -d --name shop-shop -p 8070:8070 devaraj74/shopping-cart:latest"
                     }
                 }
             }
